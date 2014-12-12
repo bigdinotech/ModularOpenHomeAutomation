@@ -1,0 +1,83 @@
+<html>
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		 var socket = io.connect();
+		 socket.on('server-event-info', function (data) {
+			 console.log(data);
+			 
+			   
+				var rawPIRSensorText = new String();
+				var rawTempText = new String();
+				var rawKeypadText = new String();	
+				var len = data.length;
+
+				// extracting the sensor frame
+				var i = data.indexOf("*",1);
+
+				// extracting the PIR sensor data
+				rawPIRSensorText = data.substring(1, i);
+
+
+				// extracting the temp sensor data
+				var i_old = i;
+				i = data.indexOf("*",i_old+1);
+				rawTempText = data.substring(i_old+1, i);
+
+
+				// extracting the keypad sensor data
+				var i_old = i;
+				i = data.indexOf("*",i_old+1);
+				rawKeypadText = data.substring(i_old+1, i);
+
+
+				console.log(rawPIRSensorText);
+				console.log(rawTempText);
+				console.log(rawKeypadText)
+			 
+				$('p .txtsensor').text(rawTempText);
+				$('p .presencesensor').text(rawPIRSensorText);
+				$('p .systemstatus').text(rawKeypadText);
+			 
+		 });
+	</script>
+
+</head>
+<body bgcolor="#82CAFA">
+	<form method="post" name="form1" target="_self">
+			&nbsp;
+			<h1>
+					Intel Galileo - Home Automation 
+					<img class="img" src="galileo.jpg">
+					</h1>
+			<h3>
+			<hr>
+					Command Relays and current state:</h3>
+			<p>
+					<input checked="checked"  class="l1" name="l1" type="radio" value="0">OFF
+					<input class="l1" name="l1" type="radio" value="1">ON &nbsp; Lamp 1</p>
+			<p>
+					<input checked="checked" class="l2" name="l2" type="radio" value="0">OFF
+					<input class="l2" name="l2" type="radio" value="1">ON &nbsp; Lamp 2</p>
+			<p>
+					<button name="commandButton" type="submit" value="SET STATE">SET STATE</button></p>
+			<p>
+					&nbsp;</p>
+			<hr>
+			<h3>
+					Sensor Readings</h3>
+			<p>
+					Temperature sensor:&nbsp;<textarea class="txtsensor" id="temp" cols="1" maxlength="10" name="txtsensor" readonly="readonly" style="margin: 2px; width: 300px; height: 32px;"></textarea></p>
+			<p>
+					Presence sensor:&nbsp;<textarea class="presencesensor" cols="1" id="sensor" maxlength="10" name="presencesensor" style="margin: 2px; width: 300px; height: 32px;"></textarea></p>
+			<p>
+					System status:&nbsp;<textarea class="systemstatus" cols="1" id="systemstatus" maxlength="10" name="systemstatus" style="margin: 2px; width: 300px; height: 32px;"></textarea></p>								
+			<div>
+					<hr>
+			</div>
+	</form>
+</body>
+
+</html>
+
