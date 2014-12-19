@@ -110,21 +110,29 @@ void *readSerial(void *arg)
 }
 //################################################################################################
 //################################################################################################
-void sendData(byte output[], int modID)
+void sendData(byte output[], int modID, int packetLength)
 {
-  /**
-  Serial.println("***TX***");
-  Serial.print("MSB: ");
-  Serial.println(moduleAddressList[modID].addr64.getMsb(), HEX);
-  Serial.print("LSB: ");
-  Serial.println(moduleAddressList[modID].addr64.getLsb(), HEX);
-            
-  Serial.print("Addr16: ");
-  Serial.println(moduleAddressList[modID].addr16), HEX;
-  **/
+  if(DEBUG)
+  {
+    Serial.println("***TX***");
+    Serial.print("MSB: ");
+    Serial.println(moduleAddressList[modID].addr64.getMsb(), HEX);
+    Serial.print("LSB: ");
+    Serial.println(moduleAddressList[modID].addr64.getLsb(), HEX);
+              
+    Serial.print("Addr16: ");
+    Serial.println(moduleAddressList[modID].addr16), HEX;
+    
+    //Serial.print("output: ");
+    //Serial.println(output);
+    
+    Serial.print("output size: ");
+    Serial.println(sizeof(output));
+  }
+
   addr64 = moduleAddressList[modID].addr64;
   
-  zbTx = ZBTxRequest(addr64, output, sizeof(output));
+  zbTx = ZBTxRequest(addr64, output, packetLength);
   zbTx.setAddress16(moduleAddressList[modID].addr16);
   xbee.send(zbTx);
 }

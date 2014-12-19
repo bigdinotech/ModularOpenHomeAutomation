@@ -2,7 +2,10 @@
 <head>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
-
+	<script>
+		var headerValue = 170;
+		var isFahrenheit = 0;
+	</script>
 	<script>
 		 var socket = io.connect();
 		 socket.on('server-event-info', function (data) {
@@ -10,7 +13,6 @@
 			 
 			var mID = data.charCodeAt(1);
 			var dataLength = data.charCodeAt(2);
-			var isFahrenheit = 0;
 			var tRadio = document.getElementsByName("tempRadio");
 			for (var i = 0, length = tRadio.length; i < length; i++) 
 			{
@@ -133,6 +135,7 @@
 		
 		function sendData(packet)
 		{
+			packet += "*";
 			socket.emit("command", packet);
 		}
 		
@@ -140,9 +143,85 @@
 		{
 			return Math.round((cTemp*9.0/5.0) + 32);
 		}
+		
+		function thermostatOffButton()
+		{
+			var mode = 0;
+			termostatCommand(mode);
+		}
+		
+		function thermostatCoolButton()
+		{
+			var mode = 1;
+			termostatCommand(mode);
+		}
+		
+		function thermostatHeatButton()
+		{
+			var mode = 2;
+			termostatCommand(mode);
+		}
+		
+		function thermostatAutoButton()
+		{
+			var mode = 3;
+			termostatCommand(mode);
+		}
+		
+		function termostatCommand(mode)
+		{
+			var cmdPacket = [];
+			var cmdPacketString = "";
+			var cmdChecksum = 0;
+			var modID = 10;
+			cmdChecksum += (modID & 0xFF);
+			var cmdLength = 3;
+			if(mode == 3)
+			{
+				cmdLength = 4;
+			}
+			cmdChecksum += (cmdLength & 0xFF);
+			var thermostatCommand = 'c';
+			if(isFahrenheit)
+			{
+				thermostatCommand = 'f';
+			}
+			cmdChecksum += (thermostatCommand.charCodeAt(0) & 0xFF);
+			//var mode = 1;
+			cmdChecksum += (mode & 0xFF);
+			var targetTemp = parseInt(document.getElementById('changetargetthermostattemperature').value);
+			var targetTemp2 = parseInt(document.getElementById('changetargetthermostattemperature2').value);
+			cmdChecksum += (targetTemp & 0XFF);
+			if(mode == 3)
+			{
+				cmdChecksum += (targetTemp2 & 0XFF);
+			}
+			cmdPacket[0] = (headerValue & 0xFF);
+			cmdPacket[1] = (modID & 0xFF);
+			cmdPacket[2] = (cmdLength & 0xFF);
+			cmdPacket[3] = (thermostatCommand.charCodeAt(0) & 0xFF);
+			cmdPacket[4] = (mode & 0xFF);
+			cmdPacket[5] = (targetTemp & 0XFF);
+			if(mode == 3)
+			{
+				cmdPacket[6] = (targetTemp2 & 0XFF);
+			}
+			cmdPacket[cmdLength+3] = (cmdChecksum & 0xFF);
+			for(i = 0; i < cmdPacket.length; i++)
+			{
+				cmdPacketString +=  cmdPacket[i] + " ";
+				//cmdPacketString +=  String.fromCharCode(cmdPacket[i]);
+				//console.log((String.fromCharCode(cmdPacket[i])).charCodeAt(0));
+				
+			}
+			cmdPacketString = cmdPacketString.trim();
+			sendData(cmdPacketString);
+			console.log(cmdPacketString);
+			//sendData(cmdPacket);
+		}
 	</script>
 </head>
-<body bgcolor="#82CAFA" onload="createPlots()">
+<body bgcolor="#82CAFA">
 	<form method="post" name="banner" target="_self">
 			<h1>
 					Intel Edison - Home Automation 
@@ -198,9 +277,12 @@
 						Thermostat Mode:&nbsp;<textarea class="mode" id="thermostatmode" cols="1" maxlength="10" name="thermostatmode" readonly="readonly" style="margin: 2px; width: 75px; height: 20px;"></textarea>
 					</p>
 					<p>
-						Target Temperature:&nbsp;<textarea class="tempsensor" id="targetthermostattemperature" cols="1" maxlength="10" name="targetthermostattemperature"  style="margin: 2px; width: 40px; height: 20px;"></textarea>
+						Target Temperature:&nbsp;<textarea class="tempsensor" id="targetthermostattemperature" cols="1" maxlength="10" name="targetthermostattemperature"  readonly="readonly" style="margin: 2px; width: 40px; height: 20px;"></textarea>
 					</p>
+					
 					<p>Mode Select:
+						Temp1: <textarea class="tempsensor" id="changetargetthermostattemperature" cols="1" maxlength="10" name="changetargetthermostattemperature"  style="margin: 2px; width: 40px; height: 20px;"></textarea>
+						Temp2: <textarea class="tempsensor" id="changetargetthermostattemperature2" cols="1" maxlength="10" name="changetargetthermostattemperature2"  style="margin: 2px; width: 40px; height: 20px;"></textarea>
 						<input id = "thermostatOffModeButton" type = "button" value = "Off" />
 						<input id = "thermostatCoolModeButton" type = "button" value = "Cool" />
 						<input id = "thermostatHeatModeButton" type = "button" value = "Heat" />
@@ -222,7 +304,10 @@
 	<script>
 		document.getElementById("toggleGarageDoor").onclick =  garageDoorButton;
 		document.getElementById("toggleGarageLight").onclick =  garageLightButton;
-		document.getElementById("thermostatOffModeButton").onclick =  sendData("nothing");
+		document.getElementById("thermostatOffModeButton").onclick =  thermostatOffButton;
+		document.getElementById("thermostatCoolModeButton").onclick =  thermostatCoolButton;
+		document.getElementById("thermostatHeatModeButton").onclick =  thermostatHeatButton;
+		document.getElementById("thermostatAutoModeButton").onclick =  thermostatAutoButton;
 	</script>
 
 	

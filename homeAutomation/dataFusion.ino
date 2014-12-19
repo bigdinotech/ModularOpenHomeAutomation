@@ -263,8 +263,9 @@ void *udpHandler(void *arg)
         }
         i++;
       }
-      if(DEBUG == 2)
+      if(DEBUG)
       {  
+        Serial.print("raw cmd: ");
         Serial.println(command);
       }
       if (DEBUG)

@@ -193,7 +193,7 @@ void loop()
     }
   }
   
-  if(Serial.available()>=6)
+  if(Serial.available())
   {
     readCommand();
   }
@@ -337,6 +337,7 @@ void checkMode()
   switch(mode)
   {
     case OFF:
+      offMode();
       break;
     case COOL:
       coolMode();
@@ -514,7 +515,17 @@ void displayMode(int mode)
 //################################################################################################
 void readCommand()
 {
-  if(Serial.available()>=6)
+  /**
+  while(Serial.available())
+  {
+    Serial.print(Serial.read(), HEX);
+    Serial.print(" ");
+    delay(10);
+  }
+  Serial.println();
+  **/
+  
+  if(Serial.available()>=7)
   {
     if(DEBUG)
     {
@@ -542,7 +553,7 @@ void readCommand()
           byte cmd = readBuffer[3];
           switch(cmd)
           {
-            case 't':
+            case 'f':
               {
                 //fahrenheit
                 int tMode = readBuffer[4];
@@ -565,11 +576,13 @@ void readCommand()
                       break;
                     default:
                       break;
-                  } 
+                  }
+                  checkMode();
+                  displayScreen(targetTemperature); 
                 }
               }
               break;
-            case 'm':
+            case 'c':
               {
                 //celsius
                 int tMode = readBuffer[4];
@@ -592,7 +605,9 @@ void readCommand()
                       break;
                     default:
                       break;
-                  }  
+                  }
+                  checkMode();
+                  displayScreen(targetTemperature);
                 }
               }
               break;
@@ -633,6 +648,7 @@ void readCommand()
   else
   {
   }
+  
 }
 
 void sendData()
