@@ -1,3 +1,5 @@
+#define DEBUG 0
+
 #include "DHT.h"
 
 #define garagedoor_pin 4
@@ -9,6 +11,8 @@ DHT dht(DHTPIN, DHTTYPE, 3);
 
 boolean validTemp = false;
 
+byte sBuff;  //temporary buffer for serial data
+byte packetBuffer[64];
 byte cmdPacket[10];
 byte dataPacket[10];
 byte headerValue = 0b10101010;
@@ -31,10 +35,15 @@ void setup()
   digitalWrite(garagelight_pin, LOW);
   digitalWrite(garagedoor_pin, LOW);
   dht.begin();
+  if(DEBUG)
+  {
+    Serial.println("Garage Module");
+  }
 }
 
 void loop()
 {
+  /**
   switch(readCommand())
   {
     case 'g':
@@ -47,6 +56,8 @@ void loop()
       break;
       //nothing
   }
+  **/
+  readCommand();
   t2 = millis();
   if((t2 -t1) > 5000)
   {
@@ -63,21 +74,12 @@ void loop()
 }
 //################################################################################################
 //################################################################################################
-char readCommand()
-{
-  if(Serial.available())
-  {
-    return (char)Serial.read();
-  }
-  else
-  {
-    return 'x';
-  }
-}
-//################################################################################################
-//################################################################################################
 void toggleGarageDoor()
 {
+  if(DEBUG)
+  {
+    Serial.println("toggling garage door");
+  }
   digitalWrite(garagedoor_pin, HIGH);
   delay(200);
   digitalWrite(garagedoor_pin, LOW);
@@ -86,6 +88,10 @@ void toggleGarageDoor()
 //################################################################################################
 void toggleGarageLight()
 {
+  if(DEBUG)
+  {
+    Serial.println("toggling garage light");
+  }
   digitalWrite(garagelight_pin, HIGH);
   delay(200);
   digitalWrite(garagelight_pin, LOW);
@@ -171,28 +177,4 @@ void readMeshData()
 {
 }
 //################################################################################################
-//################################################################################################
-void sendGarageData()
-{
-  //temperature = 26;
-  //humidity = 38;
-  readDHT();
-  determineDoorState();
-  byte dataChecksum = 0;
-  dataChecksum += modID;
-  dataChecksum += dataLength;
-  dataChecksum += (byte)temperature;
-  dataChecksum += (byte)humidity;
-  dataChecksum += (byte)garageDoorState;
-  
-  Serial.write(headerValue);
-  Serial.write(modID);
-  Serial.write(dataLength);
-  Serial.write((byte)temperature);
-  Serial.write((byte)humidity);
-  Serial.write((byte)garageDoorState);
-  Serial.write(dataChecksum);
-  Serial.flush();
-  
-}
-//################################################################################################
+

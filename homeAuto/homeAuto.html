@@ -124,13 +124,60 @@
 	<script>
 		function garageDoorButton()
 		{
-			socket.emit("command", "tgdoor*");
-			console.log("DOOR Press");
+			//socket.emit("command", "tgdoor*");
+			var cmdPacket = [];
+			var cmdPacketString = "";
+			var cmdChecksum = 0;
+			var modID = 23;
+			cmdChecksum += (modID & 0xFF);
+			var cmdLength = 1;
+			cmdChecksum += (cmdLength & 0xFF);
+			var command = 'g';
+			cmdChecksum += (command.charCodeAt(0) & 0xFF);
+			
+			cmdPacket[0] = (headerValue & 0xFF);
+			cmdPacket[1] = (modID & 0xFF);
+			cmdPacket[2] = (cmdLength & 0xFF);
+			cmdPacket[3] = (command.charCodeAt(0) & 0xFF);
+			cmdPacket[cmdLength+3] = (cmdChecksum & 0xFF)
+			
+			for(i = 0; i < cmdPacket.length; i++)
+			{
+				cmdPacketString +=  cmdPacket[i] + " ";		
+			}
+			
+			cmdPacketString = cmdPacketString.trim();
+			sendData(cmdPacketString);
+			console.log(cmdPacketString);
 		}
 
 		function garageLightButton()
 		{
-			socket.emit("command", "tglight*");
+			//socket.emit("command", "tglight*");
+			var cmdPacket = [];
+			var cmdPacketString = "";
+			var cmdChecksum = 0;
+			var modID = 23;
+			cmdChecksum += (modID & 0xFF);
+			var cmdLength = 1;
+			cmdChecksum += (cmdLength & 0xFF);
+			var command = 'l';
+			cmdChecksum += (command.charCodeAt(0) & 0xFF);
+			
+			cmdPacket[0] = (headerValue & 0xFF);
+			cmdPacket[1] = (modID & 0xFF);
+			cmdPacket[2] = (cmdLength & 0xFF);
+			cmdPacket[3] = (command.charCodeAt(0) & 0xFF);
+			cmdPacket[cmdLength+3] = (cmdChecksum & 0xFF)
+			
+			for(i = 0; i < cmdPacket.length; i++)
+			{
+				cmdPacketString +=  cmdPacket[i] + " ";		
+			}
+			
+			cmdPacketString = cmdPacketString.trim();
+			sendData(cmdPacketString);
+			console.log(cmdPacketString);
 		}
 		
 		function sendData(packet)
