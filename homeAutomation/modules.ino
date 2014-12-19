@@ -159,9 +159,6 @@ void *commandHandler(void *arg)
         }
         if(DEBUG)
         {
-          Serial.print("dataBuff size: ");
-          Serial.println(sizeof(dataBuff));
-          Serial.print("dataBuff: ");
           for(int i = 0; i < sizeof(dataBuff); i++)
           {
             Serial.print(dataBuff[i]);

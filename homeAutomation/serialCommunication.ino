@@ -122,12 +122,7 @@ void sendData(byte output[], int modID, int packetLength)
               
     Serial.print("Addr16: ");
     Serial.println(moduleAddressList[modID].addr16), HEX;
-    
-    //Serial.print("output: ");
-    //Serial.println(output);
-    
-    Serial.print("output size: ");
-    Serial.println(sizeof(output));
+  
   }
 
   addr64 = moduleAddressList[modID].addr64;
