@@ -12,7 +12,7 @@
 #include <stdlib.h> 
 #include <string.h>
 
-//XBEE Mmesh
+//XBEE Mesh
 #include <XBee.h>
 
 struct moduleData

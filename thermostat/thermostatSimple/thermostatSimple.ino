@@ -63,8 +63,8 @@ int heatOnTime = 0;
 int coolOnTime = 0;
 int heatRestTime = 0;
 int coolRestTime = 0;
-int coolMaxOnTime = 120;
-int heatMaxOnTime = 120;
+int coolMaxOnTime = 180;
+int heatMaxOnTime = 180;
 int restTime = 10;
 
 
@@ -147,6 +147,10 @@ void loop()
       Serial.println(heatTemp);
     }
   }
+  else if(t5000 > current)
+  {
+    t5000 = millis();
+  }
   if((current - t60000) > 60000)
   {
     t60000 = millis();
@@ -163,11 +167,12 @@ void loop()
     {
       if(coolRestTime >0)
       {
-        coolRestTime--;
+        coolRestTime--;   
       }
       else
       {
         ACRest = false;
+        coolOnTime = 0;
       }
     }
     
@@ -189,10 +194,14 @@ void loop()
       else
       {
         HeatRest = false;
+        heatOnTime = 0;
       }
     }
   }
-  
+  else if(t60000 > current)
+  {
+    t60000 = millis();
+  }
   if(Serial.available())
   {
     readCommand();
